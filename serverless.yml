@@ -1,0 +1,55 @@
+org: dcttechnology
+service: event-driven-notification-system
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
+  
+  eventPublisher:
+    handler: handler.publishEvent
+    events:
+      - httpApi:
+          path: /event
+          method: post
+
+  emailConsumer:
+    handler: handler.emailConsumer
+
+  analyticsConsumer:
+    handler: handler.analyticsConsumer
+
+  logConsumer:
+    handler: handler.logConsumer
+
+resources:
+  Resources:
+
+    UserSignupRule:
+      Type: AWS::Events::Rule
+      Properties:
+        EventBusName: app-event-bus
+        EventPattern:
+          source:
+            - "app.user"
+          detail-type:
+            - "USER_SIGNUP"
+        Targets:
+          - Arn:
+              Fn::GetAtt: [EmailConsumerLambdaFunction, Arn]
+            Id: "EmailTarget"
+
+          - Arn:
+              Fn::GetAtt: [AnalyticsConsumerLambdaFunction, Arn]
+            Id: "AnalyticsTarget"
+
+          - Arn:
+              Fn::GetAtt: [LogConsumerLambdaFunction, Arn]
+            Id: "LogTarget"
