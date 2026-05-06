@@ -4,6 +4,8 @@ service: event-driven-notification-system
 provider:
   name: aws
   runtime: nodejs20.x
+  region: ap-south-1
+  stage: dev
 
 functions:
   hello:
