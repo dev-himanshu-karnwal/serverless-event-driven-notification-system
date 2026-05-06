@@ -79,3 +79,8 @@ resources:
           Ref: LogConsumerLambdaFunction
         Action: lambda:InvokeFunction
         Principal: events.amazonaws.com
+
+    EventBus:
+      Type: AWS::Events::EventBus
+      Properties:
+        Name: app-event-bus
