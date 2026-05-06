@@ -31,11 +31,11 @@ functions:
 
 resources:
   Resources:
-
     UserSignupRule:
       Type: AWS::Events::Rule
       Properties:
-        EventBusName: app-event-bus
+        EventBusName: 
+          Ref: EventBus
         EventPattern:
           source:
             - "app.user"
@@ -53,3 +53,27 @@ resources:
           - Arn:
               Fn::GetAtt: [LogConsumerLambdaFunction, Arn]
             Id: "LogTarget"
+
+    EmailPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName:
+          Ref: EmailConsumerLambdaFunction
+        Action: lambda:InvokeFunction
+        Principal: events.amazonaws.com
+
+    AnalyticsPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName:
+          Ref: AnalyticsConsumerLambdaFunction
+        Action: lambda:InvokeFunction
+        Principal: events.amazonaws.com
+
+    LogPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName:
+          Ref: LogConsumerLambdaFunction
+        Action: lambda:InvokeFunction
+        Principal: events.amazonaws.com
