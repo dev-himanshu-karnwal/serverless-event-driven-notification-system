@@ -6,6 +6,16 @@ provider:
   runtime: nodejs20.x
   region: ap-south-1
   stage: dev
+  environment:
+    EVENT_BUS_NAME: ${self:custom.eventBusName}
+    REGION: ${self:provider.region}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - events:PutEvents
+          Resource: "*"
 
 functions:
   hello:
@@ -14,7 +24,7 @@ functions:
       - httpApi:
           path: /
           method: get
-  
+
   eventPublisher:
     handler: handler.publishEvent
     events:
@@ -36,7 +46,7 @@ resources:
     UserSignupRule:
       Type: AWS::Events::Rule
       Properties:
-        EventBusName: 
+        EventBusName:
           Ref: EventBus
         EventPattern:
           source:
