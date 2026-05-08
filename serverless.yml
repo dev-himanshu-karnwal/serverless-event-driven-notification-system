@@ -42,13 +42,16 @@ functions:
 
   emailConsumer:
     handler: handler.emailConsumer
+    memorySize: 128
 
   analyticsConsumer:
     handler: handler.analyticsConsumer
+    memorySize: 128
 
   logConsumer:
     handler: handler.logConsumer
-
+    memorySize: 128
+    
 resources:
   Resources:
     UserSignupRule:
