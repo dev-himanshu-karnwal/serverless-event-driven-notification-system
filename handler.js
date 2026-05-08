@@ -36,6 +36,9 @@ export const publishEvent = async (event) => {
 
     return {
       statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ message: "Event sent" }),
     };
   } catch (err) {
@@ -43,7 +46,22 @@ export const publishEvent = async (event) => {
 
     return {
       statusCode: 500,
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ error: "Failed to publish event" }),
     };
   }
+};
+
+export const emailConsumer = async (event) => {
+  console.log("EMAIL EVENT:", JSON.stringify(event, null, 2));
+};
+
+export const analyticsConsumer = async (event) => {
+  console.log("ANALYTICS EVENT:", JSON.stringify(event, null, 2));
+};
+
+export const logConsumer = async (event) => {
+  console.log("LOG EVENT:", JSON.stringify(event, null, 2));
 };
