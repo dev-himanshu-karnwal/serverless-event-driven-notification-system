@@ -1,6 +1,9 @@
 org: dcttechnology
 service: event-driven-notification-system
 
+custom:
+  eventBusName: app-event-bus
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -93,4 +96,4 @@ resources:
     EventBus:
       Type: AWS::Events::EventBus
       Properties:
-        Name: app-event-bus
+        Name: ${self:custom.eventBusName}
