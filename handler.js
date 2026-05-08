@@ -2,8 +2,14 @@ import {
   EventBridgeClient,
   PutEventsCommand,
 } from "@aws-sdk/client-eventbridge";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { nanoid } from "nanoid";
 
 const eventBridge = new EventBridgeClient({ region: process.env.REGION });
+const db = DynamoDBDocumentClient.from(
+  new DynamoDBClient({ region: process.env.REGION }),
+);
 
 export const hello = async (event) => {
   return {
@@ -55,13 +61,52 @@ export const publishEvent = async (event) => {
 };
 
 export const emailConsumer = async (event) => {
-  console.log("EMAIL EVENT:", JSON.stringify(event, null, 2));
+  for (const record of event.detail ? [event] : []) {
+    console.log(
+      JSON.stringify({
+        service: "email-service",
+        action: "send-welcome-email",
+        userId: record.detail.userId,
+        timestamp: Date.now(),
+      }),
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
 };
 
 export const analyticsConsumer = async (event) => {
-  console.log("ANALYTICS EVENT:", JSON.stringify(event, null, 2));
+  const detail = event.detail;
+
+  await db.send(
+    new PutCommand({
+      TableName: "analytics-events",
+      Item: {
+        eventId: nanoid(),
+        type: detail.type,
+        userId: detail.userId,
+        createdAt: Date.now(),
+      },
+    }),
+  );
+
+  console.log(
+    JSON.stringify({
+      service: "analytics-service",
+      status: "stored",
+      userId: detail.userId,
+    }),
+  );
 };
 
 export const logConsumer = async (event) => {
-  console.log("LOG EVENT:", JSON.stringify(event, null, 2));
+  console.log(
+    JSON.stringify({
+      service: "audit-log-service",
+      source: event.source,
+      detailType: event["detail-type"],
+      payload: event.detail,
+      receivedAt: Date.now(),
+    }),
+  );
 };
